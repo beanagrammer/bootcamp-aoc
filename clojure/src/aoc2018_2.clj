@@ -39,6 +39,9 @@
 ;; return number of dup and triples
 
 (def check_dup_and_triples
+  "Checks a string for characters that appear exactly twice and three times.
+     Input: addr - string to check
+     Returns: a map of character frequencies"
   (fn [addr]
     (let [char-freq (frequencies addr)        ;; Get frequency map of characters
           has-dup? (if (some #(= 2 %) (vals char-freq)) 1 0)     ;; Check if any char appears exactly twice
@@ -46,7 +49,11 @@
       [has-dup? has-triple?])))              ;; Return vector of [dup-count triple-count]
 
 ;; doseq = iterate over a sequece while printing each element (like foreach)
-(defn part1 [input]
+(defn part1
+  "Solves part 1 of the puzzle. Reads input file and calculates checksum of all box IDs.
+   Input: input - list of strings
+   Returns: checksum of all box IDs"
+  [input]
   (let [checksum-pairs (map check_dup_and_triples input)
         _ (println checksum-pairs)
         _ (println "\nStep 1 - Checksum pairs for each string:")
@@ -68,7 +75,12 @@
     result))
 
 ;; PART 2
+;; sort input by
+(def sorted-input (sort input))
+(println sorted-input)
+(for [i sorted-input]
 
+  (println i))
 
 ;; Test cases
 (println "\n=== Test Cases ===")
@@ -78,3 +90,46 @@
 ;; Calculate result
 (println "\n=== Part 1 Solution ===")
 (println "Final result:" (part1 input))
+
+;; Helper function to count character differences between two strings
+(defn count-differences
+  "Counts the number of characters that are different between two strings.
+   Input: str1, str2 - strings to compare
+   Returns: count of different characters"
+  [str1 str2]
+  (count (filter false? (map = str1 str2))))
+
+;; Find pairs with exactly one difference and return common letters
+(defn find-one_diff_pair
+  "Finds pairs with exactly one difference between two strings.
+   Input: addresses - list of strings
+   Returns: list of maps with :pair and :common"
+  [addresses]
+  (println "\nChecking all address pairs:")
+  (for [addr1 addresses ;; outer loop
+        addr2 addresses ;; inner loop
+        :when (and (not= addr1 addr2) ;; check if addresses are not the same
+                   (let [diff-count (count-differences addr1 addr2)]
+                     (println "\nComparing:" addr1 "vs" addr2)
+                     (println "Difference count:" diff-count)
+                     (= 1 diff-count)))]
+    (let [common-chars (map #(if (= %1 %2) %1 nil) addr1 addr2) ;; returns common characters
+          result {:pair [addr1 addr2]
+                  :common (apply str (remove nil? common-chars))}] ;; removes nil values
+      (println "Found match!")
+      (println "Common characters:" (remove nil? common-chars))
+      (println "Result:" result)
+      result)))
+
+;; Test and run part 2
+(defn part2 [input]
+  (let [result (find-one_diff_pair input)]
+    (println "\nStep 1 - Found pairs with one difference:")
+    (doseq [r result]
+      (println "Pair:" (:pair r))
+      (println "Common letters:" (:common r)))
+    (-> result first :common)))
+
+;; Run part 2
+(println "\n=== Part 2 Solution ===")
+(println "Common letters:" (part2 sorted-input))

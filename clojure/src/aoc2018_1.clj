@@ -26,8 +26,6 @@
         step2 (map parse-fn step1)]
     (vec step2)))  ;; Convert lazy sequence to vector
 
-(println "Step by step result:" numbers-step-by-step)
-
 
 ;; Parse input file into sequence of numbers
 (def numbers
