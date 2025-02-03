@@ -1,5 +1,5 @@
-(ns aoc2018-2)
-
+(ns aoc2018-2
+  (:require [clojure.string :as str])) ;; library for string manipulation
 ;; 파트 1
 ;; 주어진 각각의 문자열에서, 같은 문자가 두번 혹은 세번씩 나타난다면 각각을 한번씩 센다.
 ;; 두번 나타난 문자가 있는 문자열의 수 * 세번 나타난 문자가 있는 문자열의 수를 반환하시오.
@@ -31,3 +31,50 @@
 ;; #################################
 ;; ###        Refactoring        ###
 ;; #################################
+
+;; PART 1
+(def input
+  (->> (slurp "resources/day2.sample.txt")
+       (str/split-lines))) ;; 
+;; return number of dup and triples
+
+(def check_dup_and_triples
+  (fn [addr]
+    (let [char-freq (frequencies addr)        ;; Get frequency map of characters
+          has-dup? (if (some #(= 2 %) (vals char-freq)) 1 0)     ;; Check if any char appears exactly twice
+          has-triple? (if (some #(= 3 %) (vals char-freq)) 1 0)] ;; Check if any char appears exactly thrice
+      [has-dup? has-triple?])))              ;; Return vector of [dup-count triple-count]
+
+;; doseq = iterate over a sequece while printing each element (like foreach)
+(defn part1 [input]
+  (let [checksum-pairs (map check_dup_and_triples input)
+        _ (println checksum-pairs)
+        _ (println "\nStep 1 - Checksum pairs for each string:")
+        _ (doseq [[string pair] (map vector input checksum-pairs)]
+            (println string "=>" pair))
+
+        doubles-count (->> checksum-pairs
+                           (map first)
+                           (reduce +))
+        _ (println "\nStep 2 - Count of strings with doubles:" doubles-count)
+
+        triples-count (->> checksum-pairs
+                           (map second)
+                           (reduce +))
+        _ (println "Step 3 - Count of strings with triples:" triples-count)
+
+        result (* doubles-count triples-count)]
+    (println "\nStep 4 - Final checksum (doubles * triples):" result)
+    result))
+
+;; PART 2
+
+
+;; Test cases
+(println "\n=== Test Cases ===")
+(println "abbcde =>" (check_dup_and_triples "abbcde"))  ;; Should return [1 0]
+(println "bababc =>" (check_dup_and_triples "bababc"))  ;; Should return [1 1]
+
+;; Calculate result
+(println "\n=== Part 1 Solution ===")
+(println "Final result:" (part1 input))
