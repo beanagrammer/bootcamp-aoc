@@ -99,6 +99,8 @@
   [str1 str2]
   (count (filter false? (map = str1 str2))))
 
+;; a b c | a b e  = 1
+;; a a | b b | c e
 ;; Find pairs with exactly one difference and return common letters
 (defn find-one_diff_pair
   "Finds pairs with exactly one difference between two strings.
