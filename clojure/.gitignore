@@ -211,3 +211,6 @@ Temporary Items
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,clojure,intellij,vscode,emacs
+
+# Resources
+resources/
