@@ -31,11 +31,12 @@
 (def numbers
   (->> (slurp "resources/day1.sample.txt") ;; read the input file
        (str/split-lines) ;; split the input file into lines
-       (map #(Integer/parseInt %)))) ;; parse the lines into integers
+       (map parse-long))) ;; parse the lines into integers
 
 ;; Part 1: Sum all numbers
 (def part1
   (reduce + numbers)) ;; returns the sum of all numbers
+
 
 ;; Part 2: Find first repeated frequency
 (defn part2 [numbers]
@@ -49,6 +50,7 @@
                next-sum
                (rest nums))))))
 
+
 ;; Part 2 using reduce
 (defn part2-reduce [numbers]
   (let [freqs (reductions + 0 (cycle numbers))]  ;; Generate infinite sequence of running sums
@@ -57,9 +59,11 @@
                    (if (seen freq)                ;; If we've seen this frequency
                      (reduced freq)               ;; Return it immediately
                      (conj seen freq)))           ;; Otherwise add to seen set
-                 #{}))))                         ;; Start with empty set
+                 #{0}))))                         ;; Start with empty set
 
 ;; Print results
-(println "Part 1:" part1)
-(println "Part 2:" (part2 numbers))
-(println "Part 2 (reduce):" (part2-reduce numbers))
+(comment
+  (println "Part 1:" part1)
+  (println "Part 2:" (part2 numbers))
+  (println "Part 2 (reduce):" (part2-reduce numbers)))
+
