@@ -64,11 +64,11 @@
           width - the width of the claim
    Returns: a list of strings representing the width line"
   [id left width]
-  (let [temp-grid (vec (repeat grid-size "."))]
+  (let [temp-line (vec (repeat grid-size "."))]
     (reduce (fn [row idx]
               (assoc row idx (str id)))
-            temp-grid
-            (range left (+ left width)))))
+            temp-line
+            (range left (+ left width))))) ; range creates a sequence of numbers from left to left + width
 
 (defn fill-height
   "Fills a height line with the given ID and top coordinate.
@@ -84,22 +84,21 @@
     (map-indexed (fn [idx row]
                    (if (and (>= idx top) (< idx (+ top height)))
                      (map-indexed (fn [col val]
+                                    ; check if current grid[idx][col] is not "." and width-line[col] is not "."
                                     (if (and (not= val ".") (not= (nth width-line col) "."))
                                       "X"  ;; Collision - both have values
                                       (if (not= (nth width-line col) ".")
                                         (nth width-line col)  ;; Use width-line value
-                                        val)))  ;; Keep original value
+                                        val)))  ;; Keep original value (".")
                                   row)
                      row))
                  grid-to-fill)))
 
-;; Test the function
-(comment
-  (println "\nWidth line:")
-  (println (fill-width 1 1 3))
-  (println "\nModified grid:"))
 
-(def grid (vec (repeat grid-size (vec (repeat grid-size ".")))))
+
+(def grid
+  (vec (repeat grid-size (vec (repeat grid-size ".")))))
+
 (defn process-input
   "Processes the input and fills the grid with the claims.
    Input: input - the list of claims
@@ -121,7 +120,11 @@
        flatten
        (filter #(= "X" %))
        count))
+;; Test the function
 (comment
+  (println "\nWidth line:")
+  (println (fill-width 1 1 3))
+  (println "\nModified grid:")
   (println "\nNumber of overlapping squares:" overlap-count))
 
 ;; PART 2
