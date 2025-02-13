@@ -24,7 +24,7 @@
    Output: true if the characters are of opposite polarity, false otherwise
    Example: char1='a' char2='B' -> false | char1='A' char2='a' -> true"
   [char1 char2]
-  (= 32 (Math/abs (- (int char1) (int char2)))))
+  (= 32 (abs (- (int char1) (int char2)))))
 
 
 (defn check-polarity
@@ -120,65 +120,6 @@
             (recur merged-polymer)))))))
 
 
-(def polymer-string
-  (-> "resources/day5.sample.txt"
-      slurp          ; Read the entire file
-      str/trim))
 ;
 ;(println (process-polymer "dabAcCaCBAcCcaDA"))
-(println (count (process-polymer polymer-string)))
-;(println (process-polymer "dabAcCaCBAcCcaDA"))
-
-"
-if input is <= 1 return input
-else 
- if check-polarity
-   return middle-check(remove-polarity)
- else 
- l = middle-check(subsring(0, mid))
- r = middle-check(subsring(mid+1, end))
- check polarity of l and r 
- if true
-   return concat(l, r)
- else
-   return concat(remove-polarity)(l, r))
-"
-"
-dabAcCaCBAcCcaDA
-l=dabAcCaCB 
-remove-polarity=dabAaCB
-remove-polarity=daBCB
-l=daB
-l=da
-l=d
-r=a
-l+r=da
-r=B
-l+r=daB
-r=CB
-l+r=daBCB
-r=C
-l+r=daBCB
-r=B
-l+r=daBCB
-r=CB
-l+r=daBCB
-prev=daBCB
-prev=daBCB
-r=AcCcaDA
-remove-polarity=AcaDA
-l=Aca
-l=Ac
-l=A
-r=c
-l+r=Ac
-r=a
-l+r=Aca
-r=DA
-l=D
-r=A
-l+r=DA
-l+r=AcaDA
-prev=AcaDA
-l+r=daBCBAcaDA
-"
+(println (count (process-polymer "dabAcCaCBAcCcaDA")))
