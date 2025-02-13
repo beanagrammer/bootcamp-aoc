@@ -1,4 +1,6 @@
-(ns aoc2018_5)
+(ns aoc2018-5
+  (:require [clojure.string :as str]))
+
 ;; 파트 1
 ;; 입력: dabAcCaCBAcCcaDA
 
@@ -14,3 +16,110 @@
 ;; 주어진 문자열에서 한 유닛 (대문자와 소문자)을 전부 없앤 후 반응시켰을 때, 가장 짧은 문자열의 길이를 리턴하시오.
 ;; 예를 들어 dabAcCaCBAcCcaDA 에서 a/A를 없애고 모두 반응시키면 dbCBcD가 되고 길이는 6인데 비해,
 ;; 같은 문자열에서 c/C를 없애고 모두 반응시키면 daDA가 남고 길이가 4이므로 4가 가장 짧은 길이가 됨.
+
+
+(defn matching-case?
+  "Check if two characters are of opposite polarity
+   Input: char1=(character 1) char2=(character 2)
+   Output: true if the characters are of opposite polarity, false otherwise
+   Example: char1='a' char2='B' -> false | char1='A' char2='a' -> true"
+  [char1 char2]
+  (= 32 (abs (- (int char1) (int char2)))))
+
+
+(defn check-polarity
+  "Check if the left and right characters are of opposite polarity
+   Input: left=(left character) centre=(centre character) right=(right character)
+   Output: 
+       {:is-polarity true :side :left} or 
+       {:is-polarity true :side :right} or 
+       {:is-polarity false :side nil}"
+  [left centre right]
+  (if (matching-case? left centre)
+    {:is-polarity true :side :left}
+    (if (and (not= right \.) (matching-case? centre right))
+      {:is-polarity true :side :right}
+      {:is-polarity false :side nil})))
+
+(defn remove-polarity
+  "Remove the polarity at the given side and index
+   Input: side=(side to remove) mid=(middle index) input=(input string)
+   Output: new input with the polarity removed
+   Example: input='cCaB' side=:left mid=1 -> 'aB'"
+  [side mid input]
+  (case side
+    :left (str (subs input 0 (dec mid))
+               (subs input (inc mid)))
+    :right (str (subs input 0 mid)
+                (subs input (+ mid 2)))
+    input))
+
+(defn safe-nth
+  "Safely get index value
+   Input: s=input idx=index default=default value if index is out of bounds
+   Output: value at index or default value
+   Example: s=ab idsx=2 default=. -> ."
+  [s idx default]
+  (if (and (>= idx 0) (< idx (count s)))
+    (nth s idx)
+    default))
+
+(defn find-middle-reaction
+  "Find the middle reaction
+   Input: input=(input string) mid=(middle index)
+   Output: {:is-polarity true :side :left} or {:is-polarity true :side :right} or {:is-polarity false :side nil}
+   Example: input='cCa' mid=1 -> {:is-polarity true :side :left}"
+  [input mid]
+  (check-polarity (safe-nth input (dec mid) \.)
+                  (safe-nth input mid \.)
+                  (safe-nth input (inc mid) \.)))
+
+(defn find-joining-reaction
+  "Find the joining reaction
+     Input: left=(left string) right=(right string)
+     Output: true if there is a reaction at the joining point, false otherwise
+     Example: left='a' right='B' -> false"
+  [left right]
+  (and (seq left)
+       (seq right)
+       (matching-case? (last left) (first right))))
+
+(defn merge-segments
+  "Merge the two segments
+   Input: left=(left string) right=(right string)
+   Output: merged string
+   Example: left='a' right='B' -> 'aB'"
+  [left right]
+  (if (find-joining-reaction left right)
+    (str (subs left 0 (dec (count left)))
+         (subs right 1))
+    (str left right)))
+
+(defn process-polymer
+  "Recursively processes a polymer string to remove all reactions
+   Input: input=(input string)
+   Output: processed string
+   Example: input='cCaB' -> 'aB'"
+  [input]
+  (if (<= (count input) 1)
+    input
+    (let [mid (quot (count input) 2)
+          reaction (find-middle-reaction input mid)]
+      (cond
+        (:is-polarity reaction)
+        (recur (remove-polarity (:side reaction) mid input))
+
+        :else
+        (let [left-polymer (subs input 0 mid)
+              right-polymer (subs input mid)
+              reduced-left (process-polymer left-polymer)
+              reduced-right (process-polymer right-polymer)
+              merged-polymer (merge-segments reduced-left reduced-right)]
+          (if (= merged-polymer input)
+            merged-polymer
+            (recur merged-polymer)))))))
+
+
+;
+;(println (process-polymer "dabAcCaCBAcCcaDA"))
+(println (count (process-polymer "dabAcCaCBAcCcaDA")))
