@@ -250,7 +250,6 @@
 
   (println "Sleepiest guard: " sleepiest-guard)
   (println "Sleepiest minute: " sleepiest-minute)
-
   (println "Part 1: " (* (:guard-id sleepiest-guard) (:minute sleepiest-minute)))
 
   (def guards-sleepiest-minutes (map find-sleepiest-minute (:patterns guard-patterns-test)))
