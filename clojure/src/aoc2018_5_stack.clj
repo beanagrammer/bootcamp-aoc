@@ -51,4 +51,39 @@
       str/trim))
 
 ;(println polymer)
-(println (count (stack-process-polymer polymer-string)))
+
+
+; PART 2
+
+(defn remove-polymer-pair
+  "Remove a polymer pair from the polymer string
+   Input: pair=(polymer pair) polymer-string=(polymer string)
+   Output: polymer string without the pair
+   Example: pair='a' polymer-string='dabAcCaCBAcCcaDA' -> 'dbcCCBcCcD'"
+  [pair polymer-string]
+  (-> polymer-string
+      (str/replace (re-pattern (str "(?i)" pair)) "")))
+
+
+(defn full-reaction-removed
+  "Remove a polymer pair from the polymer string and process the polymer
+   Input: removed-unit=(polymer pair) polymer-string=(polymer string)
+   Output: polymer string without the pair and its length
+   Example: removed-unit='a' polymer-string='dabAcCaCBAcCcaDA' -> 'dbcCCBcCcD' -> 'dbCBcD' -> 6"
+  [removed-unit polymer-string]
+  (->> polymer-string
+       (remove-polymer-pair removed-unit)
+       stack-process-polymer
+       count))
+
+(defn find-min-polyer
+  [polymer-string]
+  (->>
+   (range (int \a) (inc (int \z)))
+   (map #(full-reaction-removed (char %) polymer-string))
+   (sort)
+   (first)))
+
+(comment
+  (println "Part 1:" (count (stack-process-polymer polymer-string)))
+  (println "Part 2:" (find-min-polyer polymer-string)))
